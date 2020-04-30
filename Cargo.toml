@@ -1,5 +1,5 @@
 [package]
-name = "rust-blogpost-auth-async"
+name = "rust-auth-async"
 version = "0.1.0"
 authors = ["T5uku5hi <misaki.makino@gmail.com>"]
 edition = "2018"
