@@ -61,3 +61,40 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
+#[test]
+fn it_works() {
+    use curl::easy::{Easy, List};
+    dotenv::dotenv().ok();
+    let token = std::env::var("ACCESS_TOKEN").expect("ACCESS_TOKEN must be set");
+    let mut list = List::new();
+    list.append(&("Authorization: Bearer ".to_owned() + &token)).unwrap();
+    let mut easy = Easy::new();
+    easy.url("http://localhost:8080/users").unwrap();
+    easy.http_headers(list).unwrap();
+    easy.perform().unwrap();
+
+    assert_eq!(easy.response_code().unwrap(), 200);
+}
+
+#[test]
+fn no_auth_header() {
+    use curl::easy::Easy;
+    let mut easy = Easy::new();
+    easy.url("http://localhost:8080/users").unwrap();
+    easy.perform().unwrap();
+
+    assert_eq!(easy.response_code().unwrap(), 401);
+}
+
+#[test]
+fn invalid_auth_header() {
+    use curl::easy::{Easy, List};
+    let mut list = List::new();
+    list.append("Authorization: Bearer XXXX").unwrap();
+    let mut easy = Easy::new();
+    easy.url("http://localhost:8080/users").unwrap();
+    easy.http_headers(list).unwrap();
+    easy.perform().unwrap();
+
+    assert_eq!(easy.response_code().unwrap(), 401);
+}
